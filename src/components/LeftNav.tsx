@@ -19,7 +19,7 @@
 
 import { Home, Code2, Briefcase, Mail, Menu, X } from "lucide-react"; // Icon components
 import { useState } from "react";
-import { ImageWithFallback } from "./ImageWithFallback"; // custom safe image component
+import { ImageWithFallback } from "./ImageWithFallback"; // optimized image component with fallback support
 
 // -----------------------------------------------------
 // 🔸 Props Interface
@@ -107,6 +107,9 @@ export function LeftNav({ activeSection, setActiveSection }: LeftNavProps) {
               <ImageWithFallback
                 src="/rain_avatar.jpg" // your avatar image
                 alt="Profile"
+                width={80}
+                height={80}
+                sizes="80px"
                 className="relative w-20 h-20 rounded-full object-cover border-2 border-zinc-700 mx-auto"
               />
             </div>

@@ -13,8 +13,8 @@
  * 🧩 Dependencies:
  *   - React Hooks: useRef + useEffect
  *   - lucide-react: icon library for GitHub / LinkedIn icons
- *   - ImageWithFallback: custom image component that shows a fallback image
- *     if the main one fails to load.
+ *   - ImageWithFallback (Next.js Image wrapper): optimized image loading with
+ *     graceful fallback imagery.
  */
 
 import { useEffect, useRef } from "react";
@@ -105,7 +105,11 @@ export function HeroSection({ id, setActiveSection }: HeroSectionProps) {
               <ImageWithFallback
                 src="/rain_hero.jpg" // change to your actual portrait
                 alt="Profile"
+                width={320}
+                height={320}
+                sizes="(max-width: 768px) 16rem, 20rem"
                 className="w-64 h-64 md:w-80 md:h-80 object-cover rounded-[3rem] border-8 border-white shadow-2xl relative z-10"
+                priority
               />
 
               {/* Floating accent boxes (decorative geometry) */}
