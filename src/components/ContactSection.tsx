@@ -41,6 +41,11 @@ export function ContactSection({ id, setActiveSection }: ContactSectionProps) {
     message: "",
   });
 
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
+    "idle"
+  );
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+
   // -----------------------------------------------------
   // 📡 Intersection Observer
   // -----------------------------------------------------
@@ -67,11 +72,39 @@ export function ContactSection({ id, setActiveSection }: ContactSectionProps) {
   // ✉️ Form Handlers
   // -----------------------------------------------------
 
-  // Submit handler: intercepts form submission and prints payload
-  const handleSubmit = (e: React.FormEvent) => {
+  // Submit handler: send payload to Next.js API route
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Normally this would call an API (EmailJS, Resend, Nodemailer, etc.)
-    console.log("Form submitted:", formData);
+    setStatus("loading");
+    setFeedbackMessage(null);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        throw new Error(data?.error ?? "Failed to send your message.");
+      }
+
+      setStatus("success");
+      setFeedbackMessage("Thanks for reaching out! I’ll respond shortly.");
+      setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      setStatus("error");
+      setFeedbackMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong. Please try again."
+      );
+    }
   };
 
   // Input change handler: updates individual fields
@@ -228,11 +261,28 @@ export function ContactSection({ id, setActiveSection }: ContactSectionProps) {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full px-6 py-4 bg-zinc-900 text-white rounded-2xl hover:bg-zinc-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex items-center justify-center gap-2"
+                disabled={status === "loading"}
+                className={`w-full px-6 py-4 rounded-2xl flex items-center justify-center gap-2 transition-all duration-200 ${
+                  status === "loading"
+                    ? "bg-zinc-400 text-white cursor-not-allowed"
+                    : "bg-zinc-900 text-white hover:bg-zinc-800 hover:shadow-xl hover:-translate-y-1"
+                }`}
               >
-                <span>Send Message</span>
+                <span>
+                  {status === "loading" ? "Sending..." : "Send Message"}
+                </span>
                 <Send className="w-5 h-5" />
               </button>
+
+              {feedbackMessage && (
+                <p
+                  className={`text-sm ${
+                    status === "success" ? "text-emerald-600" : "text-red-600"
+                  }`}
+                >
+                  {feedbackMessage}
+                </p>
+              )}
             </form>
           </div>
         </div>
