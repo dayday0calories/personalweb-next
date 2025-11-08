@@ -83,7 +83,7 @@ export async function POST(request: Request) {
     await resend.emails.send({
       from: FROM_EMAIL, // Sender identity (must match verified domain)
       to: TO_EMAIL, // Recipient (you or a configured inbox)
-      reply_to: email, // Makes replies go back to the sender
+      replyTo: email, // Makes replies go back to the sender
       subject: `New portfolio inquiry from ${name}`, // Custom subject line
       text: formattedBody, // Simple text-based email body
     });
